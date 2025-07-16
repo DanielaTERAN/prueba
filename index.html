@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.js"></script>
     <title>Geoportal - Deslizamientos Cantón Loja</title>
     <style>
         * {
@@ -415,16 +417,14 @@
         </section>
 
         <section class="map-container">
-            <h2 style="color: #2c3e50; margin-bottom: 20px;">🗺️ Mapa Principal - Cantón Loja</h2>
-            <div class="map-placeholder">
-                <div style="text-align: center;">
-                    <div style="font-size: 48px; margin-bottom: 20px;">🗺️</div>
-                    <div>Mapa Interactivo de Deslizamientos</div>
-                    <div style="font-size: 0.9em; margin-top: 10px;">
-                        Haz clic en "Acceder a Mapas" para ver la cartografía completa
-                    </div>
-                </div>
+            <h2 style="color: #2c3e50; margin-bottom: 20px;">🗺️ Mapa Interactivo - Ecuador</h2>
+            <div class="map-controls" style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
+                <button class="map-control-btn" onclick="toggleLayer('risk')" style="background: #e74c3c; color: white; border: none; padding: 8px 16px; border-radius: 20px; cursor: pointer;">Zonas de Riesgo</button>
+                <button class="map-control-btn" onclick="toggleLayer('monitoring')" style="background: #3498db; color: white; border: none; padding: 8px 16px; border-radius: 20px; cursor: pointer;">Puntos de Monitoreo</button>
+                <button class="map-control-btn" onclick="toggleLayer('precipitation')" style="background: #2ecc71; color: white; border: none; padding: 8px 16px; border-radius: 20px; cursor: pointer;">Precipitaciones</button>
+                <button class="map-control-btn" onclick="focusLoja()" style="background: #f39c12; color: white; border: none; padding: 8px 16px; border-radius: 20px; cursor: pointer;">Enfocar Loja</button>
             </div>
+            <div id="map" style="height: 500px; width: 100%; border-radius: 10px; border: 2px solid #ddd;"></div>
         </section>
     </div>
 
@@ -442,8 +442,20 @@
     </footer>
 
     <script>
+        // Variables globales para el mapa
+        let map;
+        let riskLayer, monitoringLayer, precipitationLayer;
+        let layersVisible = {
+            risk: true,
+            monitoring: true,
+            precipitation: false
+        };
+
         // Simulación de funcionalidad interactiva
         document.addEventListener('DOMContentLoaded', function() {
+            // Inicializar el mapa
+            initializeMap();
+            
             const buttons = document.querySelectorAll('.module-button');
             
             buttons.forEach(button => {
@@ -475,6 +487,144 @@
                 });
             }, 30000); // Actualización cada 30 segundos
         });
+
+        // Función para inicializar el mapa
+        function initializeMap() {
+            // Crear el mapa centrado en Ecuador
+            map = L.map('map').setView([-1.8312, -78.1834], 6);
+
+            // Añadir capa base (OpenStreetMap)
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
+
+            // Crear capas de datos
+            createDataLayers();
+
+            // Añadir marcador para Loja
+            L.marker([-3.9928, -79.2042])
+                .bindPopup('<b>Cantón Loja</b><br>Área de estudio principal<br>Población: ~215,000 habitantes')
+                .addTo(map);
+
+            // Añadir algunas ciudades principales del Ecuador
+            addEcuadorCities();
+        }
+
+        // Función para crear las capas de datos
+        function createDataLayers() {
+            // Capa de zonas de riesgo (polígonos rojos)
+            riskLayer = L.layerGroup();
+            
+            // Zonas de riesgo simuladas en Loja y otras provincias
+            const riskZones = [
+                {coords: [[-4.05, -79.25], [-4.05, -79.15], [-3.95, -79.15], [-3.95, -79.25]], name: "Zona Alto Riesgo - Loja Centro", level: "Alto"},
+                {coords: [[-4.10, -79.30], [-4.10, -79.20], [-4.00, -79.20], [-4.00, -79.30]], name: "Zona Riesgo Moderado - Loja Sur", level: "Moderado"},
+                {coords: [[-0.25, -78.55], [-0.25, -78.45], [-0.15, -78.45], [-0.15, -78.55]], name: "Zona Riesgo - Pichincha", level: "Alto"},
+                {coords: [[-2.20, -78.95], [-2.20, -78.85], [-2.10, -78.85], [-2.10, -78.95]], name: "Zona Riesgo - Chimborazo", level: "Moderado"},
+                {coords: [[-1.25, -78.65], [-1.25, -78.55], [-1.15, -78.55], [-1.15, -78.65]], name: "Zona Riesgo - Tungurahua", level: "Alto"}
+            ];
+
+            riskZones.forEach(zone => {
+                const color = zone.level === "Alto" ? "#e74c3c" : "#f39c12";
+                L.polygon(zone.coords, {
+                    color: color,
+                    fillColor: color,
+                    fillOpacity: 0.3,
+                    weight: 2
+                }).bindPopup(`<b>${zone.name}</b><br>Nivel de riesgo: ${zone.level}`)
+                .addTo(riskLayer);
+            });
+
+            // Capa de puntos de monitoreo
+            monitoringLayer = L.layerGroup();
+            
+            const monitoringPoints = [
+                {coords: [-3.9928, -79.2042], name: "Estación Loja Centro", status: "Activo"},
+                {coords: [-4.0354, -79.2013], name: "Estación El Plateado", status: "Activo"},
+                {coords: [-4.0157, -79.1789], name: "Estación La Banda", status: "Mantenimiento"},
+                {coords: [-0.2201, -78.5123], name: "Estación Quito Norte", status: "Activo"},
+                {coords: [-2.1962, -78.9475], name: "Estación Riobamba", status: "Activo"},
+                {coords: [-1.2490, -78.6067], name: "Estación Baños", status: "Activo"},
+                {coords: [-2.9001, -79.0059], name: "Estación Cuenca", status: "Activo"}
+            ];
+
+            monitoringPoints.forEach(point => {
+                const color = point.status === "Activo" ? "#3498db" : "#e67e22";
+                L.circleMarker(point.coords, {
+                    color: color,
+                    fillColor: color,
+                    fillOpacity: 0.8,
+                    radius: 8
+                }).bindPopup(`<b>${point.name}</b><br>Estado: ${point.status}`)
+                .addTo(monitoringLayer);
+            });
+
+            // Capa de precipitaciones (círculos verdes)
+            precipitationLayer = L.layerGroup();
+            
+            const precipitationData = [
+                {coords: [-3.9928, -79.2042], value: 45, location: "Loja"},
+                {coords: [-0.2201, -78.5123], value: 23, location: "Quito"},
+                {coords: [-2.1962, -78.9475], value: 67, location: "Riobamba"},
+                {coords: [-1.2490, -78.6067], value: 89, location: "Baños"},
+                {coords: [-2.9001, -79.0059], value: 34, location: "Cuenca"}
+            ];
+
+            precipitationData.forEach(data => {
+                const intensity = data.value > 60 ? 15 : data.value > 30 ? 10 : 5;
+                const color = data.value > 60 ? "#27ae60" : data.value > 30 ? "#f1c40f" : "#95a5a6";
+                
+                L.circleMarker(data.coords, {
+                    color: color,
+                    fillColor: color,
+                    fillOpacity: 0.6,
+                    radius: intensity
+                }).bindPopup(`<b>${data.location}</b><br>Precipitación: ${data.value}mm/24h`)
+                .addTo(precipitationLayer);
+            });
+
+            // Añadir capas iniciales al mapa
+            riskLayer.addTo(map);
+            monitoringLayer.addTo(map);
+        }
+
+        // Función para añadir ciudades principales del Ecuador
+        function addEcuadorCities() {
+            const cities = [
+                {coords: [-0.2201, -78.5123], name: "Quito", population: "2.8M"},
+                {coords: [-2.1962, -78.9475], name: "Guayaquil", population: "2.7M"},
+                {coords: [-2.9001, -79.0059], name: "Cuenca", population: "636K"},
+                {coords: [-1.0546, -80.4789], name: "Machala", population: "290K"},
+                {coords: [-1.2490, -78.6067], name: "Ambato", population: "387K"},
+                {coords: [0.9924, -79.4673], name: "Esmeraldas", population: "218K"}
+            ];
+
+            cities.forEach(city => {
+                L.marker(city.coords)
+                    .bindPopup(`<b>${city.name}</b><br>Población: ${city.population}`)
+                    .addTo(map);
+            });
+        }
+
+        // Función para alternar capas
+        function toggleLayer(layerName) {
+            const layer = layerName === 'risk' ? riskLayer : 
+                         layerName === 'monitoring' ? monitoringLayer : 
+                         precipitationLayer;
+            
+            if (layersVisible[layerName]) {
+                map.removeLayer(layer);
+                layersVisible[layerName] = false;
+            } else {
+                layer.addTo(map);
+                layersVisible[layerName] = true;
+            }
+        }
+
+        // Función para enfocar en Loja
+        function focusLoja() {
+            map.setView([-3.9928, -79.2042], 12);
+        }
     </script>
 </body>
 </html>
