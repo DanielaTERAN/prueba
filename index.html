@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -32,7 +31,7 @@
   }).addTo(map);
 
   async function cargarDatosTurismo() {
-    const endpoint = `${url}/rest/v1/turismo?select=id,Nombre,Tipo,Subtipo,Provincia,Canton,Parroquia,Categoria,Jerarquia,num_atr,desc_,desc2,desc3,pdf,img,geom:ST_AsGeoJSON(geom)::json`;
+    const endpoint = `${url}/rest/v1/turismo?select=id,Nombre,Tipo,Subtipo,Provincia,Canton,Parroquia,Categoria,Jerarquia,num_atr,desc_,desc2,desc3,pdf,img,geom=ST_AsGeoJSON(geom)`;
 
     try {
       const res = await fetch(endpoint, {
@@ -53,22 +52,27 @@
       console.log("Datos cargados:", data);
 
       data.forEach(item => {
-        if (item.geom && item.geom.type === "Point") {
-          const [lng, lat] = item.geom.coordinates;
+        try {
+          const geom = JSON.parse(item.geom);
+          if (geom && geom.type === "Point") {
+            const [lng, lat] = geom.coordinates;
 
-          const popup = `
-            <div class="popup-content">
-              <strong>${item.Nombre || 'Sin nombre'}</strong><br>
-              <em>${item.Tipo || ''} - ${item.Subtipo || ''}</em><br>
-              <b>Provincia:</b> ${item.Provincia || ''}<br>
-              <b>Categoría:</b> ${item.Categoria || ''}<br>
-              <p>${item.desc_ || ''}</p>
-              ${item.img ? `<img src="${item.img}" alt="imagen" style="max-width:100px;"><br>` : ""}
-              ${item.pdf ? `<a href="${item.pdf}" target="_blank">Ver PDF</a>` : ""}
-            </div>
-          `;
+            const popup = `
+              <div class="popup-content">
+                <strong>${item.Nombre || 'Sin nombre'}</strong><br>
+                <em>${item.Tipo || ''} - ${item.Subtipo || ''}</em><br>
+                <b>Provincia:</b> ${item.Provincia || ''}<br>
+                <b>Categoría:</b> ${item.Categoria || ''}<br>
+                <p>${item.desc_ || ''}</p>
+                ${item.img ? `<img src="${item.img}" alt="imagen" style="max-width:100px;"><br>` : ""}
+                ${item.pdf ? `<a href="${item.pdf}" target="_blank">Ver PDF</a>` : ""}
+              </div>
+            `;
 
-          L.marker([lat, lng]).addTo(map).bindPopup(popup);
+            L.marker([lat, lng]).addTo(map).bindPopup(popup);
+          }
+        } catch (err) {
+          console.error("Error procesando geometría:", err, item);
         }
       });
     } catch (error) {
