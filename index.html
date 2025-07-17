@@ -1,630 +1,83 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.css" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.js"></script>
-    <title>Geoportal - Deslizamientos Cantón Loja</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-        }
-
-        .header {
-            background: linear-gradient(90deg, #1e3c72 0%, #2a5298 100%);
-            color: white;
-            padding: 20px 0;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-
-        .header-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 20px;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .logo-icon {
-            width: 50px;
-            height: 50px;
-            background: #ff6b6b;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            font-weight: bold;
-        }
-
-        .logo-text {
-            font-size: 28px;
-            font-weight: bold;
-        }
-
-        .nav-menu {
-            display: flex;
-            gap: 30px;
-        }
-
-        .nav-menu a {
-            color: white;
-            text-decoration: none;
-            font-weight: 500;
-            transition: color 0.3s;
-        }
-
-        .nav-menu a:hover {
-            color: #ff6b6b;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 40px 20px;
-        }
-
-        .hero {
-            background: white;
-            border-radius: 20px;
-            padding: 40px;
-            margin-bottom: 40px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            text-align: center;
-        }
-
-        .hero h1 {
-            color: #2c3e50;
-            font-size: 3em;
-            margin-bottom: 20px;
-        }
-
-        .hero p {
-            color: #7f8c8d;
-            font-size: 1.2em;
-            line-height: 1.6;
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-bottom: 40px;
-        }
-
-        .stat-card {
-            background: white;
-            padding: 30px;
-            border-radius: 15px;
-            text-align: center;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            transition: transform 0.3s;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-5px);
-        }
-
-        .stat-number {
-            font-size: 2.5em;
-            font-weight: bold;
-            color: #e74c3c;
-            margin-bottom: 10px;
-        }
-
-        .stat-label {
-            color: #7f8c8d;
-            font-size: 1.1em;
-        }
-
-        .modules {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 30px;
-            margin-bottom: 40px;
-        }
-
-        .module-card {
-            background: white;
-            border-radius: 15px;
-            padding: 30px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            transition: transform 0.3s, box-shadow 0.3s;
-        }
-
-        .module-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-        }
-
-        .module-icon {
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            color: white;
-            margin-bottom: 20px;
-        }
-
-        .module-title {
-            font-size: 1.5em;
-            font-weight: bold;
-            color: #2c3e50;
-            margin-bottom: 15px;
-        }
-
-        .module-description {
-            color: #7f8c8d;
-            line-height: 1.6;
-            margin-bottom: 20px;
-        }
-
-        .module-button {
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: transform 0.3s;
-        }
-
-        .module-button:hover {
-            transform: scale(1.05);
-        }
-
-        .map-container {
-            background: white;
-            border-radius: 15px;
-            padding: 30px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            margin-bottom: 40px;
-        }
-
-        .map-placeholder {
-            height: 400px;
-            background: linear-gradient(45deg, #f8f9fa, #e9ecef);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #6c757d;
-            font-size: 1.2em;
-            border: 2px dashed #dee2e6;
-        }
-
-        .alert-section {
-            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
-            color: white;
-            padding: 30px;
-            border-radius: 15px;
-            margin-bottom: 40px;
-        }
-
-        .alert-title {
-            font-size: 1.8em;
-            font-weight: bold;
-            margin-bottom: 15px;
-        }
-
-        .alert-content {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-        }
-
-        .alert-item {
-            background: rgba(255,255,255,0.1);
-            padding: 20px;
-            border-radius: 10px;
-            backdrop-filter: blur(10px);
-        }
-
-        .footer {
-            background: #2c3e50;
-            color: white;
-            padding: 40px 0;
-            text-align: center;
-        }
-
-        .footer-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-
-        .footer-links {
-            display: flex;
-            justify-content: center;
-            gap: 40px;
-            margin-bottom: 20px;
-        }
-
-        .footer-links a {
-            color: white;
-            text-decoration: none;
-            transition: color 0.3s;
-        }
-
-        .footer-links a:hover {
-            color: #ff6b6b;
-        }
-
-        @media (max-width: 768px) {
-            .nav-menu {
-                display: none;
-            }
-            
-            .hero h1 {
-                font-size: 2em;
-            }
-            
-            .stats {
-                grid-template-columns: 1fr;
-            }
-            
-            .modules {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <title>Geovisor Turismo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    crossorigin=""
+  />
+  <style>
+    body { margin: 0; font-family: sans-serif; }
+    #map { height: 100vh; width: 100vw; }
+    .popup-content { font-size: 0.9em; }
+  </style>
 </head>
 <body>
-    <header class="header">
-        <div class="header-content">
-            <div class="logo">
-                <div class="logo-icon">🏔️</div>
-                <div class="logo-text">GEOPORTAL LOJA</div>
-            </div>
-            <nav class="nav-menu">
-                <a href="#inicio">Inicio</a>
-                <a href="#mapas">Mapas</a>
-                <a href="#datos">Datos</a>
-                <a href="#alertas">Alertas</a>
-                <a href="#contacto">Contacto</a>
-            </nav>
-        </div>
-    </header>
 
-    <div class="container">
-        <section class="hero">
-            <h1>Sistema de Monitoreo de Deslizamientos</h1>
-            <p>Plataforma integral para la gestión de riesgos por deslizamientos de tierra en el cantón Loja. 
-            Accede a información geoespacial actualizada, mapas de riesgo, alertas tempranas y herramientas 
-            de análisis para la toma de decisiones en gestión de riesgos naturales.</p>
-        </section>
+<div id="map"></div>
 
-        <section class="stats">
-            <div class="stat-card">
-                <div class="stat-number">127</div>
-                <div class="stat-label">Puntos de Monitoreo</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number">23</div>
-                <div class="stat-label">Zonas de Alto Riesgo</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number">5.2K</div>
-                <div class="stat-label">Habitantes en Riesgo</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number">24/7</div>
-                <div class="stat-label">Monitoreo Continuo</div>
-            </div>
-        </section>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+<script>
+  const url = 'https://nytzdjxdmpmnzcrdmzit.supabase.co';
+  const key = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im55dHpkanhkbXBtbnpjcmRteml0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI2Mjc5MDgsImV4cCI6MjA2ODIwMzkwOH0.altu2BeaHT6dTQ60GeuGwkSwrShYEvouY1lPMWcVy0o';
 
-        <section class="alert-section">
-            <h2 class="alert-title">🚨 Alertas Activas</h2>
-            <div class="alert-content">
-                <div class="alert-item">
-                    <strong>Alerta Amarilla</strong><br>
-                    Sector El Plateado - Precipitaciones intensas registradas
-                </div>
-                <div class="alert-item">
-                    <strong>Monitoreo Especial</strong><br>
-                    Barrio La Banda - Movimiento de suelo detectado
-                </div>
-                <div class="alert-item">
-                    <strong>Mantenimiento</strong><br>
-                    Sensores Zamora Huayco - Calibración programada
-                </div>
-            </div>
-        </section>
+  const map = L.map('map').setView([-1.8312, -78.1834], 6); // Ecuador
 
-        <section class="modules">
-            <div class="module-card">
-                <div class="module-icon">🗺️</div>
-                <h3 class="module-title">Mapas de Riesgo</h3>
-                <p class="module-description">
-                    Visualiza mapas interactivos con zonificación de riesgo por deslizamientos, 
-                    incluyendo pendientes, geología, precipitaciones y vulnerabilidad social.
-                </p>
-                <button class="module-button">Acceder a Mapas</button>
-            </div>
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap contributors'
+  }).addTo(map);
 
-            <div class="module-card">
-                <div class="module-icon">📊</div>
-                <h3 class="module-title">Datos Históricos</h3>
-                <p class="module-description">
-                    Consulta base de datos de eventos históricos de deslizamientos en Loja, 
-                    con información detallada de daños, causas y medidas implementadas.
-                </p>
-                <button class="module-button">Ver Datos</button>
-            </div>
+  async function cargarDatosTurismo() {
+    const endpoint = `${url}/rest/v1/turismo?select=id,Nombre,Tipo,Subtipo,Provincia,Canton,Parroquia,Categoria,Jerarquia,num_atr,desc_,desc2,desc3,pdf,img,geom:ST_AsGeoJSON(geom)::json`;
 
-            <div class="module-card">
-                <div class="module-icon">🌧️</div>
-                <h3 class="module-title">Monitoreo Climático</h3>
-                <p class="module-description">
-                    Accede a datos en tiempo real de precipitaciones, humedad del suelo 
-                    y condiciones meteorológicas que influyen en el riesgo de deslizamientos.
-                </p>
-                <button class="module-button">Monitorear</button>
-            </div>
-
-            <div class="module-card">
-                <div class="module-icon">⚠️</div>
-                <h3 class="module-title">Sistema de Alertas</h3>
-                <p class="module-description">
-                    Recibe notificaciones automáticas basadas en umbrales de precipitación 
-                    y movimiento de suelo para activar protocolos de emergencia.
-                </p>
-                <button class="module-button">Configurar Alertas</button>
-            </div>
-
-            <div class="module-card">
-                <div class="module-icon">🏘️</div>
-                <h3 class="module-title">Vulnerabilidad Social</h3>
-                <p class="module-description">
-                    Analiza la vulnerabilidad de las comunidades ante deslizamientos, 
-                    considerando factores socioeconómicos y capacidad de respuesta.
-                </p>
-                <button class="module-button">Analizar</button>
-            </div>
-
-            <div class="module-card">
-                <div class="module-icon">📱</div>
-                <h3 class="module-title">Reportes Ciudadanos</h3>
-                <p class="module-description">
-                    Permite a los ciudadanos reportar grietas, hundimientos o signos 
-                    de inestabilidad del terreno en sus sectores.
-                </p>
-                <button class="module-button">Reportar</button>
-            </div>
-        </section>
-
-        <section class="map-container">
-            <h2 style="color: #2c3e50; margin-bottom: 20px;">🗺️ Mapa Interactivo - Ecuador</h2>
-            <div class="map-controls" style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
-                <button class="map-control-btn" onclick="toggleLayer('risk')" style="background: #e74c3c; color: white; border: none; padding: 8px 16px; border-radius: 20px; cursor: pointer;">Zonas de Riesgo</button>
-                <button class="map-control-btn" onclick="toggleLayer('monitoring')" style="background: #3498db; color: white; border: none; padding: 8px 16px; border-radius: 20px; cursor: pointer;">Puntos de Monitoreo</button>
-                <button class="map-control-btn" onclick="toggleLayer('precipitation')" style="background: #2ecc71; color: white; border: none; padding: 8px 16px; border-radius: 20px; cursor: pointer;">Precipitaciones</button>
-                <button class="map-control-btn" onclick="focusLoja()" style="background: #f39c12; color: white; border: none; padding: 8px 16px; border-radius: 20px; cursor: pointer;">Enfocar Loja</button>
-            </div>
-            <div id="map" style="height: 500px; width: 100%; border-radius: 10px; border: 2px solid #ddd;"></div>
-        </section>
-    </div>
-
-    <footer class="footer">
-        <div class="footer-content">
-            <div class="footer-links">
-                <a href="#terminos">Términos de Uso</a>
-                <a href="#privacidad">Política de Privacidad</a>
-                <a href="#ayuda">Ayuda</a>
-                <a href="#contacto">Contacto</a>
-            </div>
-            <p>&copy; 2025 Geoportal Loja - Sistema de Monitoreo de Deslizamientos. Todos los derechos reservados.</p>
-            <p>Desarrollado para la gestión de riesgos naturales en el cantón Loja, Ecuador</p>
-        </div>
-    </footer>
-
-    <script>
-        // Variables globales para el mapa
-        let map;
-        let riskLayer, monitoringLayer, precipitationLayer;
-        let layersVisible = {
-            risk: true,
-            monitoring: true,
-            precipitation: false
-        };
-
-        // Simulación de funcionalidad interactiva
-        document.addEventListener('DOMContentLoaded', function() {
-            // Inicializar el mapa
-            initializeMap();
-            
-            const buttons = document.querySelectorAll('.module-button');
-            
-            buttons.forEach(button => {
-                button.addEventListener('click', function() {
-                    const module = this.closest('.module-card');
-                    const title = module.querySelector('.module-title').textContent;
-                    
-                    // Simulación de navegación
-                    alert(`Accediendo a: ${title}\n\nEsta funcionalidad estaría conectada a los sistemas de información geográfica correspondientes.`);
-                });
-            });
-
-            // Simulación de actualización de estadísticas
-            setInterval(() => {
-                const statNumbers = document.querySelectorAll('.stat-number');
-                statNumbers.forEach(stat => {
-                    if (stat.textContent === '24/7') return;
-                    
-                    // Pequeñas variaciones aleatorias para simular datos en tiempo real
-                    const currentValue = parseInt(stat.textContent.replace('K', '000'));
-                    const variation = Math.floor(Math.random() * 3) - 1;
-                    const newValue = currentValue + variation;
-                    
-                    if (stat.textContent.includes('K')) {
-                        stat.textContent = (newValue / 1000).toFixed(1) + 'K';
-                    } else {
-                        stat.textContent = newValue;
-                    }
-                });
-            }, 30000); // Actualización cada 30 segundos
-        });
-
-        // Función para inicializar el mapa
-        function initializeMap() {
-            // Crear el mapa centrado en Ecuador
-            map = L.map('map').setView([-1.8312, -78.1834], 6);
-
-            // Añadir capa base (OpenStreetMap)
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '© OpenStreetMap contributors'
-            }).addTo(map);
-
-            // Crear capas de datos
-            createDataLayers();
-
-            // Añadir marcador para Loja
-            L.marker([-3.9928, -79.2042])
-                .bindPopup('<b>Cantón Loja</b><br>Área de estudio principal<br>Población: ~215,000 habitantes')
-                .addTo(map);
-
-            // Añadir algunas ciudades principales del Ecuador
-            addEcuadorCities();
+    try {
+      const res = await fetch(endpoint, {
+        headers: {
+          apikey: key,
+          Authorization: `Bearer ${key}`
         }
+      });
 
-        // Función para crear las capas de datos
-        function createDataLayers() {
-            // Capa de zonas de riesgo (polígonos rojos)
-            riskLayer = L.layerGroup();
-            
-            // Zonas de riesgo simuladas en Loja y otras provincias
-            const riskZones = [
-                {coords: [[-4.05, -79.25], [-4.05, -79.15], [-3.95, -79.15], [-3.95, -79.25]], name: "Zona Alto Riesgo - Loja Centro", level: "Alto"},
-                {coords: [[-4.10, -79.30], [-4.10, -79.20], [-4.00, -79.20], [-4.00, -79.30]], name: "Zona Riesgo Moderado - Loja Sur", level: "Moderado"},
-                {coords: [[-0.25, -78.55], [-0.25, -78.45], [-0.15, -78.45], [-0.15, -78.55]], name: "Zona Riesgo - Pichincha", level: "Alto"},
-                {coords: [[-2.20, -78.95], [-2.20, -78.85], [-2.10, -78.85], [-2.10, -78.95]], name: "Zona Riesgo - Chimborazo", level: "Moderado"},
-                {coords: [[-1.25, -78.65], [-1.25, -78.55], [-1.15, -78.55], [-1.15, -78.65]], name: "Zona Riesgo - Tungurahua", level: "Alto"}
-            ];
+      if (!res.ok) {
+        const errorText = await res.text();
+        console.error("Error HTTP:", res.status, errorText);
+        alert("❌ Error al cargar datos: " + res.status);
+        return;
+      }
 
-            riskZones.forEach(zone => {
-                const color = zone.level === "Alto" ? "#e74c3c" : "#f39c12";
-                L.polygon(zone.coords, {
-                    color: color,
-                    fillColor: color,
-                    fillOpacity: 0.3,
-                    weight: 2
-                }).bindPopup(`<b>${zone.name}</b><br>Nivel de riesgo: ${zone.level}`)
-                .addTo(riskLayer);
-            });
+      const data = await res.json();
+      console.log("Datos cargados:", data);
 
-            // Capa de puntos de monitoreo
-            monitoringLayer = L.layerGroup();
-            
-            const monitoringPoints = [
-                {coords: [-3.9928, -79.2042], name: "Estación Loja Centro", status: "Activo"},
-                {coords: [-4.0354, -79.2013], name: "Estación El Plateado", status: "Activo"},
-                {coords: [-4.0157, -79.1789], name: "Estación La Banda", status: "Mantenimiento"},
-                {coords: [-0.2201, -78.5123], name: "Estación Quito Norte", status: "Activo"},
-                {coords: [-2.1962, -78.9475], name: "Estación Riobamba", status: "Activo"},
-                {coords: [-1.2490, -78.6067], name: "Estación Baños", status: "Activo"},
-                {coords: [-2.9001, -79.0059], name: "Estación Cuenca", status: "Activo"}
-            ];
+      data.forEach(item => {
+        if (item.geom && item.geom.type === "Point") {
+          const [lng, lat] = item.geom.coordinates;
 
-            monitoringPoints.forEach(point => {
-                const color = point.status === "Activo" ? "#3498db" : "#e67e22";
-                L.circleMarker(point.coords, {
-                    color: color,
-                    fillColor: color,
-                    fillOpacity: 0.8,
-                    radius: 8
-                }).bindPopup(`<b>${point.name}</b><br>Estado: ${point.status}`)
-                .addTo(monitoringLayer);
-            });
+          const popup = `
+            <div class="popup-content">
+              <strong>${item.Nombre || 'Sin nombre'}</strong><br>
+              <em>${item.Tipo || ''} - ${item.Subtipo || ''}</em><br>
+              <b>Provincia:</b> ${item.Provincia || ''}<br>
+              <b>Categoría:</b> ${item.Categoria || ''}<br>
+              <p>${item.desc_ || ''}</p>
+              ${item.img ? `<img src="${item.img}" alt="imagen" style="max-width:100px;"><br>` : ""}
+              ${item.pdf ? `<a href="${item.pdf}" target="_blank">Ver PDF</a>` : ""}
+            </div>
+          `;
 
-            // Capa de precipitaciones (círculos verdes)
-            precipitationLayer = L.layerGroup();
-            
-            const precipitationData = [
-                {coords: [-3.9928, -79.2042], value: 45, location: "Loja"},
-                {coords: [-0.2201, -78.5123], value: 23, location: "Quito"},
-                {coords: [-2.1962, -78.9475], value: 67, location: "Riobamba"},
-                {coords: [-1.2490, -78.6067], value: 89, location: "Baños"},
-                {coords: [-2.9001, -79.0059], value: 34, location: "Cuenca"}
-            ];
-
-            precipitationData.forEach(data => {
-                const intensity = data.value > 60 ? 15 : data.value > 30 ? 10 : 5;
-                const color = data.value > 60 ? "#27ae60" : data.value > 30 ? "#f1c40f" : "#95a5a6";
-                
-                L.circleMarker(data.coords, {
-                    color: color,
-                    fillColor: color,
-                    fillOpacity: 0.6,
-                    radius: intensity
-                }).bindPopup(`<b>${data.location}</b><br>Precipitación: ${data.value}mm/24h`)
-                .addTo(precipitationLayer);
-            });
-
-            // Añadir capas iniciales al mapa
-            riskLayer.addTo(map);
-            monitoringLayer.addTo(map);
+          L.marker([lat, lng]).addTo(map).bindPopup(popup);
         }
+      });
+    } catch (error) {
+      console.error("Error de red o código:", error);
+      alert("❌ No se pudieron cargar los datos.");
+    }
+  }
 
-        // Función para añadir ciudades principales del Ecuador
-        function addEcuadorCities() {
-            const cities = [
-                {coords: [-0.2201, -78.5123], name: "Quito", population: "2.8M"},
-                {coords: [-2.1962, -78.9475], name: "Guayaquil", population: "2.7M"},
-                {coords: [-2.9001, -79.0059], name: "Cuenca", population: "636K"},
-                {coords: [-1.0546, -80.4789], name: "Machala", population: "290K"},
-                {coords: [-1.2490, -78.6067], name: "Ambato", population: "387K"},
-                {coords: [0.9924, -79.4673], name: "Esmeraldas", population: "218K"}
-            ];
-
-            cities.forEach(city => {
-                L.marker(city.coords)
-                    .bindPopup(`<b>${city.name}</b><br>Población: ${city.population}`)
-                    .addTo(map);
-            });
-        }
-
-        // Función para alternar capas
-        function toggleLayer(layerName) {
-            const layer = layerName === 'risk' ? riskLayer : 
-                         layerName === 'monitoring' ? monitoringLayer : 
-                         precipitationLayer;
-            
-            if (layersVisible[layerName]) {
-                map.removeLayer(layer);
-                layersVisible[layerName] = false;
-            } else {
-                layer.addTo(map);
-                layersVisible[layerName] = true;
-            }
-        }
-
-        // Función para enfocar en Loja
-        function focusLoja() {
-            map.setView([-3.9928, -79.2042], 12);
-        }
-    </script>
+  cargarDatosTurismo();
+</script>
 </body>
 </html>
